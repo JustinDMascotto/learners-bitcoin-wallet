@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import { Keys } from '../model/keys'
 
 // Define the shape of your state
 interface AppState {
-  counter: number;
+  keys: Keys | undefined;
 }
 
 // Define the shape of your context
@@ -13,34 +14,28 @@ interface AppContextProps {
 
 // Initial state
 const initialState: AppState = {
-  counter: 0,
+  keys: undefined,
 };
 
 // Create context
 const AppStateContext = createContext<AppContextProps | undefined>(undefined);
 
 // Actions
-const INCREMENT = 'INCREMENT';
-const DECREMENT = 'DECREMENT';
+const IMPORT = 'IMPORT';
 
 // Action creators
-interface IncrementAction {
-  type: typeof INCREMENT;
+interface ImportAction {
+  type: typeof IMPORT;
+  keys: Keys
 }
 
-interface DecrementAction {
-  type: typeof DECREMENT;
-}
-
-type AppActions = IncrementAction | DecrementAction;
+type AppActions = ImportAction;
 
 // Reducer
 const appReducer = (state: AppState, action: AppActions): AppState => {
   switch (action.type) {
-    case INCREMENT:
-      return { ...state, counter: state.counter + 1 };
-    case DECREMENT:
-      return { ...state, counter: state.counter - 1 };
+    case IMPORT:
+      return { ...state, keys: state.keys = action.keys };
     default:
       return state;
   }

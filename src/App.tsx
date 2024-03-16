@@ -1,7 +1,8 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/home/home'
-import PrivateKeysFromBook from './pages/private-keys/private-keys-from-book';
+import ImportKeys from './pages/import-keys/import-keys';
+import { IMPORT_KEYS } from './pages/constants';
 
 function App() {
   return (
@@ -9,7 +10,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home/>}></Route>
-          <Route path="/private-keys" element={<PrivateKeysFromBook/>}></Route>
+          <Route path={`/${IMPORT_KEYS}`} element={<ImportKeys/>}></Route>
         </Routes>
       </Router>
     </div>

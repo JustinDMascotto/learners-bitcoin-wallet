@@ -1,15 +1,23 @@
+import { Buffer } from 'buffer';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { AppStateProvider } from './components/AppState';
+window.Buffer = Buffer;
+
+// import process from 'process';
+// window.process = process;
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <AppStateProvider>
+      <App />
+    </AppStateProvider>
   </React.StrictMode>
 );
 

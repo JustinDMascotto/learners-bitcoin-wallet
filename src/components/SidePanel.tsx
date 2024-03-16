@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { IMPORT_KEYS } from '../pages/constants';
 
 const SidePanel = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +14,7 @@ const SidePanel = () => {
         <div style={{ width: '250px', background: 'lightgrey', position: 'absolute', height: '100%' }}>
           <ul style={{ listStyleType: 'none', padding: 0 }}>
             <li><Link to="/" onClick={() => setIsOpen(false)}>Home</Link></li>
-            <li><Link to="/private-keys" onClick={() => setIsOpen(false)}>Private Keys</Link></li>
+            <li><Link to={`/${IMPORT_KEYS}`} onClick={() => setIsOpen(false)}>Import Keys</Link></li>
             {/* Add more links as needed */}
           </ul>
         </div>
