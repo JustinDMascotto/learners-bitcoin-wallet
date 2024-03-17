@@ -3,6 +3,7 @@ import SidePanel from '../../components/SidePanel';
 import { useAppState } from '../../components/AppState';
 import { Keys } from '../../models/keys';
 import * as networks from 'bitcoinjs-lib/src/networks';
+import { DisplayKeys } from '../../components/DisplayKeys';
 
 const ImportKeys = () => {
   // State to hold the input value
@@ -10,6 +11,7 @@ const ImportKeys = () => {
 
   const [activeTab, setActiveTab] = useState('mnemonic');
   const [mnemonic, setMnemonic] = useState('');
+  const [brainWallet, setBrainWallet] = useState('');
   const [hex, setHex] = useState('');
   const [xpriv, setXpriv] = useState('');
 
@@ -20,6 +22,11 @@ const ImportKeys = () => {
 
   const importMnemonic = () => {
     let keys = Keys.importFromMnemonic(mnemonic, networks.testnet);
+    dispatchImport(keys);
+  }
+
+  const importBrainWallet = () => {
+    let keys = Keys.importBrainWallet(brainWallet, networks.testnet);
     dispatchImport(keys);
   }
 
@@ -45,6 +52,7 @@ const ImportKeys = () => {
             <button onClick={() => setActiveTab('mnemonic')}>Import Mnemonic</button>
             <button onClick={() => setActiveTab('hex')}>Import Hex</button>
             <button onClick={() => setActiveTab('xpriv')}>Import Xpriv</button>
+            <button onClick={() => setActiveTab('brain')}>Import Brain Wallet</button>
           </div>
           {activeTab === 'mnemonic' && (
             <div>
@@ -54,6 +62,16 @@ const ImportKeys = () => {
                 onChange={(e) => setMnemonic(e.target.value)}
               />
               <button onClick={importMnemonic}>Import</button>
+            </div>
+          )}
+          {activeTab === 'brain' && (
+            <div>
+              <input
+                type="text"
+                value={brainWallet}
+                onChange={(e) => setBrainWallet(e.target.value)}
+              />
+              <button onClick={importBrainWallet}>Import</button>
             </div>
           )}
           {activeTab === 'hex' && (
@@ -77,11 +95,7 @@ const ImportKeys = () => {
             </div>
           )}
       </div>
-      {state.keys != undefined && (
-        <div>
-          Your private key has been imported! Public key hex: {state.keys.toString()}
-        </div>
-      )}
+      <DisplayKeys/>
     </div>
   );
 };

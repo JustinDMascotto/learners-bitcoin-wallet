@@ -33,6 +33,11 @@ export class Keys {
         return this.importFromSeed(Buffer.from(hex,'hex'),network);
     }
 
+    static importBrainWallet(secret:string,network:bitcoin.Network):Keys {
+        let buffer = Buffer.from(secret,'utf8');
+        return this.importFromSeed(buffer,network);
+    }
+
     private static importFromSeed(seed:Buffer,network:bitcoin.Network):Keys {
         return new Keys(bip32.fromSeed(seed),network);
     }
