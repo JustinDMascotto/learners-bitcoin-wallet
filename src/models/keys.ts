@@ -1,9 +1,9 @@
 import * as bip32Int from 'bip32'
 import * as bitcoin from 'bitcoinjs-lib'
-import BIP32Factory from 'bip32';
-import ecc from '@bitcoinerlab/secp256k1';
 import * as bip39 from 'bip39';
+import { BIP32Factory } from 'bip32';
 
+const ecc = require('@bitcoinerlab/secp256k1')
 const bip32 = BIP32Factory(ecc);
 
 export class Keys {
@@ -13,6 +13,10 @@ export class Keys {
     constructor(hdRoot: bip32Int.BIP32Interface, network: bitcoin.Network) {
         this.hdRoot = hdRoot;
         this.network = network;
+    }
+
+    toString(): string {
+        return this.hdRoot.publicKey.toString('hex')
     }
 
     static importFromXpriv(xprivBase58: string, network: bitcoin.Network) : Keys {

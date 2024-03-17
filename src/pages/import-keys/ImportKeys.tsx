@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import SidePanel from '../../components/SidePanel';
 import { useAppState } from '../../components/AppState';
-import { Keys } from '../../model/keys';
+import { Keys } from '../../models/keys';
 import * as networks from 'bitcoinjs-lib/src/networks';
 
 const ImportKeys = () => {

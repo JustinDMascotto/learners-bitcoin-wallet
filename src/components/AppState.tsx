@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { Keys } from '../model/keys'
+import { Keys } from '../models/keys'
 
 // Define the shape of your state
 interface AppState {
