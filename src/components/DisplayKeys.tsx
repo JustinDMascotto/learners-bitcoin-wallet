@@ -1,11 +1,7 @@
 import { useAppState } from "./AppState"
-import { getAddress } from "../utils/addressUtils"
-import * as networks from 'bitcoinjs-lib/src/networks';
 
 export const DisplayKeys = () => {
-    const { state, dispatch } = useAppState();
-
-    const address = getAddress(state.keys?.hdRoot,networks.testnet)
+    const { state } = useAppState();
 
     return (
         <div>
@@ -19,7 +15,7 @@ export const DisplayKeys = () => {
                     </div>    
                     <div>
                         Extended privkey: {state.keys.hdRoot.toBase58()}
-                    </div>  
+                    </div>
                 </div>
             )}
         </div>
