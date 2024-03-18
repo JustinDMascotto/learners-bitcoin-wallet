@@ -3,8 +3,6 @@ import { useAppState } from "../../components/AppState"
 import { getAddressP2WPKH } from "../../utils/addressUtils";
 import SidePanel from "../../components/SidePanel";
 import { Keys } from "../../models/keys";
-import { stat } from "fs";
-import internal from "stream";
 
 
 interface TableRow extends Address {
@@ -66,7 +64,7 @@ export const Wallet = () => {
     async function mockReq(delay:number):Promise<number> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(1);
+                resolve(10);
             }, delay);
         });
     }
@@ -75,8 +73,8 @@ export const Wallet = () => {
 
     useEffect(() => {
         const fetchData = async (address: string) => {
-            await mockReq(2000); // Assuming mockReq is defined and returns a promise
-            return 10; // Or whatever data you're fetching
+            let value = await mockReq(2000); // Assuming mockReq is defined and returns a promise
+            return value; // Or whatever data you're fetching
         };
     
         const accumulateData = async () => {
@@ -98,9 +96,6 @@ export const Wallet = () => {
     
             // Wait for all data to be accumulated
             const tableData = await Promise.all(tableDataPromises);
-            
-            console.log( 'here' )
-            console.log( tableData)
     
             // Update state with the accumulated data
             setTableData(tableData);
@@ -134,7 +129,7 @@ export const Wallet = () => {
                         <td onClick={() => setHighlighted({ rowIndex, colType: 'first-second' })}
                             style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType ==='first-second' ? 'yellow' : 'transparent' }}
                         >
-                           {row.externalPubAddress}
+                            {row.externalPubAddress}
                         </td>
                         <td onClick={() => setHighlighted({ rowIndex, colType: 'first-second' })}
                             style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType === 'first-second' ? 'yellow' : 'transparent' }}
@@ -144,7 +139,7 @@ export const Wallet = () => {
                         <td onClick={() => setHighlighted({ rowIndex, colType: 'third-fourth' })}
                             style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType === 'third-fourth' ? 'yellow' : 'transparent' }}
                         >
-                           {row.internalPubAddress}
+                            {row.internalPubAddress}
                         </td>
                         <td onClick={() => setHighlighted({ rowIndex, colType: 'third-fourth' })}
                             style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType === 'third-fourth' ? 'yellow' : 'transparent' }}

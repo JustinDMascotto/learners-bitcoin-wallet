@@ -3,7 +3,7 @@ import * as bitcoin from 'bitcoinjs-lib'
 import * as bip39 from 'bip39';
 import { BIP32Factory } from 'bip32';
 
-const ecc = require('@bitcoinerlab/secp256k1')
+const ecc: bip32Int.TinySecp256k1Interface = require('@bitcoinerlab/secp256k1')
 const bip32 = BIP32Factory(ecc);
 
 export class Keys {

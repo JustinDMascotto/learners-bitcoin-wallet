@@ -15,11 +15,6 @@ const ImportKeys = () => {
   const [hex, setHex] = useState('');
   const [xpriv, setXpriv] = useState('');
 
-  // // useEffect(() => {
-  // //   const processedValue = process(inputValue);
-  // //   setOutputValue(processedValue);
-  // // },[inputValue])
-
   const importMnemonic = () => {
     let keys = Keys.importFromMnemonic(mnemonic, networks.testnet);
     dispatchImport(keys);

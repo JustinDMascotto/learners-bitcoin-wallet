@@ -1,9 +1,9 @@
-{
-    // "jestrunner.configPath": "jest.config.js"
-    "jest.pathToJest": "npm run test --",
-    "jest.runner": "npm run test --",
-    "jest.rootPath": "./",
-    "jest.autoEnable": true,
-    "jest.enableInlineErrorMessages": true,
-    "jest.enableSnapshotUpdateMessages": true
-}
+// {
+//     // "jestrunner.configPath": "jest.config.js"
+//     "jest.pathToJest": "npm run test --",
+//     "jest.runner": "npm run test --",
+//     "jest.rootPath": "./",
+//     "jest.autoEnable": true,
+//     "jest.enableInlineErrorMessages": true,
+//     "jest.enableSnapshotUpdateMessages": true
+// }
