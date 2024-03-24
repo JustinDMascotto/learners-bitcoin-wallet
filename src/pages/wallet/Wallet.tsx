@@ -1,31 +1,15 @@
 import { useEffect, useState } from "react"
 import { useAppState } from "../../components/AppState"
-import { getAddressP2WPKH } from "../../utils/addressUtils";
+import { Address, getAddressesForAccount, getAddressP2WPKH } from '../../utils/addressUtils'
 import SidePanel from "../../components/SidePanel";
-import { Keys } from "../../models/keys";
+import * as electrumClient from '../../services/electrumClient'
 
 
 interface TableRow extends Address {
     amountInt: number | undefined,
-    amountExt: number | undefined
-}
-
-interface Address {
-    externalPubAddress: string,
-    internalPubAddress: string
-}
-
-function getAddressesForAccount(account:number,
-                                keys: Keys): Address[] {
-    let addresses: Address[] = [];
-    for(let i = 0; i < 10; i++) {
-        let childAddr = keys.hdRoot.deriveHardened(account).derive(i)
-        addresses.push({
-            externalPubAddress: getAddressP2WPKH(childAddr?.derive(0).neutered(),keys?.network),
-            internalPubAddress: getAddressP2WPKH(childAddr?.derive(1).neutered(),keys?.network),
-        })
-    }
-    return addresses;
+    utxoInt: electrumClient.ListUnspentResponseElement[] | undefined,
+    amountExt: number | undefined,
+    utxoExt: electrumClient.ListUnspentResponseElement[] | undefined,
 }
 
 
@@ -51,7 +35,9 @@ export const Wallet = () => {
                 let tableData: TableRow[] = addresses.map( it => ({externalPubAddress: it.externalPubAddress, 
                     internalPubAddress: it.internalPubAddress,
                     amountExt: undefined,
-                    amountInt: undefined}));
+                    utxoExt: undefined,
+                    amountInt: undefined,
+                    utxoInt: undefined}));
                 setTableData(tableData)
             }
             let address = getAddressP2WPKH(state.keys?.hdRoot.derivePath(derivePath).neutered(),state.keys?.network)
@@ -59,22 +45,12 @@ export const Wallet = () => {
         } 
     },[derivePath,state.keys]);
 
-
-
-    async function mockReq(delay:number):Promise<number> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(10);
-            }, delay);
-        });
-    }
-
     
 
     useEffect(() => {
-        const fetchData = async (address: string) => {
-            let value = await mockReq(2000); // Assuming mockReq is defined and returns a promise
-            return value; // Or whatever data you're fetching
+        const fetchData = async (address: string) : Promise<electrumClient.ListUnspentResponseElement[]> => {
+            let utxos = await electrumClient.getUtxos(address,state.keys?.network!);
+            return utxos; // Or whatever data you're fetching
         };
     
         const accumulateData = async () => {
@@ -85,12 +61,18 @@ export const Wallet = () => {
                         fetchData(address.externalPubAddress),
                         fetchData(address.internalPubAddress),
                     ]);
+                    const sumInternal = internalAddrAmount.reduce((accumulator, currentItem) => {
+                        return accumulator + currentItem.value;
+                      }, 0);
+                    const sumExternal = externalAddrAmount.reduce((accumulator, currentItem) => {
+                        return accumulator + currentItem.value;
+                      }, 0);
                     
                     // Return the new object to include in tableData
-                    return {...address, amountExt: externalAddrAmount, amountInt: internalAddrAmount};
+                    return {...address, amountExt: sumExternal, amountInt: sumInternal, utxoInt: internalAddrAmount, utxoExt: externalAddrAmount};
                 } catch (error) {
                     console.error(error);
-                    return { ...address, amountExt: 0, amountInt: 0 }; // Or however you wish to handle errors
+                    return { ...address, amountExt: 0, amountInt: 0, utxoExt: [], utxoInt: [] }; // Or however you wish to handle errors
                 }
             });
     
@@ -102,7 +84,7 @@ export const Wallet = () => {
         };
     
         accumulateData();
-    }, [addresses]); // Dependency array - re-run the effect if something changes, if needed
+    }, [addresses,state.keys]); // Dependency array - re-run the effect if something changes, if needed
 
 
     return (

@@ -10,17 +10,21 @@
     "@types/jest": "^27.5.2",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
+    "axios": "^1.6.8",
     "bip32": "^4.0.0",
     "bip32-utils": "^0.11.1",
     "bip39": "^3.1.0",
+    "bitcoin-core": "^4.2.0",
     "bitcoinjs-lib": "^6.1.5",
     "bs58check": "^3.0.1",
     "crypto": "^1.0.1",
+    "net": "^1.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "ws": "^8.16.0"
   },
   "scripts": {
     "start": "react-app-rewired start",
