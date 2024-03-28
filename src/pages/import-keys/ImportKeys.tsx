@@ -12,22 +12,22 @@ const ImportKeys = () => {
   const [input, setInput] = useState('');
 
   const importMnemonic = (mnemonic:string) => {
-    const keys = Keys.importFromMnemonic(mnemonic, networks.testnet);
+    const keys = Keys.importFromMnemonic(mnemonic, state.settings!.network);
     dispatchImport(keys);
   }
 
   const importBrainWallet = (brainWallet:string) => {
-    const keys = Keys.importBrainWallet(brainWallet, networks.testnet);
+    const keys = Keys.importBrainWallet(brainWallet, state.settings!.network);
     dispatchImport(keys);
   }
 
   const importHex = (hex:string) => {
-    const keys = Keys.importFromHex(hex, networks.testnet);
+    const keys = Keys.importFromHex(hex, state.settings!.network);
     dispatchImport(keys);
   }
 
   const importXpriv = (xpriv:string) => {
-    const keys = Keys.importFromXpriv(xpriv, networks.testnet);
+    const keys = Keys.importFromXpriv(xpriv, state.settings!.network);
     dispatchImport(keys);
   }
 
