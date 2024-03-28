@@ -4,8 +4,19 @@ import Home from './pages/home/Home'
 import ImportKeys from './pages/import-keys/ImportKeys';
 import { HOME, IMPORT_KEYS, WALLET } from './pages/constants';
 import { Wallet } from './pages/wallet/Wallet';
+import { getSettings } from './pages/settings/Settings';
+import { useEffect } from 'react'
+import { useAppState } from './components/AppState';
 
 function App() {
+
+  const { state, dispatch } = useAppState();
+
+  useEffect(() => {
+    const settings = getSettings();
+    dispatch({type:'LOAD_SETTINGS', settings})
+  },[]);
+
   return (
     <div>
       <Router>

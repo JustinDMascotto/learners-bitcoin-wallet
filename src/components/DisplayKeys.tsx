@@ -4,7 +4,6 @@ import * as bip39 from 'bip39';
 
 export const DisplayKeys = () => {
     const { state } = useAppState();
-    const [mnemonic,setMnemonic] = useState('')
 
     useEffect(() => {
         bip39.generateMnemonic()
@@ -22,9 +21,6 @@ export const DisplayKeys = () => {
                     </div>    
                     <div>
                         Extended privkey: {state.keys.hdRoot.toBase58()}
-                    </div>
-                    <div>
-                        Mnemonic phrase: {mnemonic}
                     </div>
                 </div>
             )}
