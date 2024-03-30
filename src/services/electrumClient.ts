@@ -1,8 +1,6 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import axios from 'axios'
-
-const hostAddress = "localhost"
-const port = 3001
+import { getSettings } from '../pages/settings/settingsUtil';
 
 // Function to create a JSON-RPC 2.0 request
 function createBody(method: string, params: any[] = [], id: number = 1) {
@@ -39,10 +37,10 @@ function createBody(method: string, params: any[] = [], id: number = 1) {
 // }
 
 // supports both bech32 and base58 address formats
-export async function getUtxos(address:string,network:bitcoin.networks.Network):Promise<ListUnspentResponseElement[]> {
+export async function getUtxos(address:string,network:bitcoin.networks.Network,electrsProxyHost:string):Promise<ListUnspentResponseElement[]> {
     const scriptPubKey = bitcoin.address.toOutputScript(address!,network);
     const hash = bitcoin.crypto.sha256(scriptPubKey).reverse().toString('hex');
-    const response = await sendRequestAxios('blockchain.scripthash.listunspent',[hash]);
+    const response = await sendRequestAxios(electrsProxyHost,'blockchain.scripthash.listunspent',[hash]);
     return response.data.result
 }
 
@@ -54,10 +52,10 @@ export interface ListUnspentResponseElement {
 }
 
 // Send request with mode: 'no-cors' removes the body of the post request 
-export async function sendRequest(method:string,params?:any[]): Promise<Response> {
+export async function sendRequest(electrsProxyHost:string,method:string,params?:any[]): Promise<Response> {
     const body = JSON.stringify(createBody(method,params));
     console.log(body)
-    return await fetch(`http://${hostAddress}:${port}/send-request`,{
+    return await fetch(`${electrsProxyHost}/send-request`,{
         method: 'POST',
         headers: {
             'Content-Type':'application/json'
@@ -66,12 +64,14 @@ export async function sendRequest(method:string,params?:any[]): Promise<Response
     });
 }
 
-export async function sendRequestAxios(method:string,params?:any[]):Promise<any> {
+export async function sendRequestAxios(electrsProxyHost:string,method:string,params?:any[]):Promise<any> {
+    // could move getSettings call somewhere so its not loaded every call but just when settings change
+    
     try {
       const data = createBody(method, params);
       console.log(JSON.stringify(data));
       
-      const response = await axios.post(`http://${hostAddress}:${port}/send-request`, data);
+      const response = await axios.post(`${electrsProxyHost}/send-request`, data);
       return response; // The caller will need to use response.data to access the returned data
     } catch (error) {
       console.error('Request failed:', error);

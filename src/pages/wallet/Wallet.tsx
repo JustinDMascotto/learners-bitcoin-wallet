@@ -30,7 +30,7 @@ export const Wallet = () => {
             let account = derivePath.match(regex);
             if(account && account[1]) {
                 setAccount(parseInt(account[1]));
-                let addresses = getAddressesForAccount(parseInt(account[1]),state.keys!);
+                let addresses = getAddressesForAccount(parseInt(account[1]),state.settings.addressType,state.keys!);
                 setAddresses(addresses)
                 let tableData: TableRow[] = addresses.map( it => ({externalPubAddress: it.externalPubAddress, 
                     internalPubAddress: it.internalPubAddress,
@@ -49,7 +49,7 @@ export const Wallet = () => {
 
     useEffect(() => {
         const fetchData = async (address: string) : Promise<electrumClient.ListUnspentResponseElement[]> => {
-            let utxos = await electrumClient.getUtxos(address,state.keys?.network!);
+            let utxos = await electrumClient.getUtxos(address,state.keys?.network!,state.settings.electrsProxyHost);
             return utxos; // Or whatever data you're fetching
         };
     

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { IMPORT_KEYS, WALLET } from '../pages/constants';
+import { IMPORT_KEYS, SETTINGS, WALLET } from '../pages/constants';
 
 const SidePanel = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +16,7 @@ const SidePanel = () => {
             <li><Link to="/" onClick={() => setIsOpen(false)}>Home</Link></li>
             <li><Link to={`/${IMPORT_KEYS}`} onClick={() => setIsOpen(false)}>Import Keys</Link></li>
             <li><Link to={`/${WALLET}`} onClick={() => setIsOpen(false)}>Wallet</Link></li>
+            <li><Link to={`/${SETTINGS}`} onClick={() => setIsOpen(false)}>Settings</Link></li>
             {/* Add more links as needed */}
           </ul>
         </div>

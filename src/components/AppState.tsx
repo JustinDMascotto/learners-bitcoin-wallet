@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { Keys } from '../models/keys'
-import { Settings } from '../pages/settings/Settings';
+import { Settings } from '../models/settings';
+import { getSettings } from '../pages/settings/settingsUtil';
 
 // Define the shape of your state
 interface AppState {
   keys: Keys | undefined;
-  settings: Settings | undefined;
+  settings: Settings;
 }
 
 // Define the shape of your context
@@ -14,10 +15,13 @@ interface AppContextProps {
   dispatch: React.Dispatch<any>;
 }
 
+
+const initSettings = getSettings();
+
 // Initial state
 const initialState: AppState = {
   keys: undefined,
-  settings: undefined
+  settings: initSettings
 };
 
 // Create context
