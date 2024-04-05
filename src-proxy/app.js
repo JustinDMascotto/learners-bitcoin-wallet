@@ -7,15 +7,15 @@ const PORT = 3001; // Port for the Express server
 app.use(express.json());
 app.use(cors())
 
-const hostAddress = "192.168.1.5"
-const port = 50001
+const hostAddress = process.env.ELECTRS_HOST.split(':')[0]
+const port = process.env.ELECTRS_HOST.split(':')[1]
 
 app.post('/send-request', (req, res) => {
     const client = new net.Socket();
     
     client.connect(port, hostAddress, () => {
         const body = JSON.stringify(req.body)+'\n'
-        console.log(`Proxying request to tcp server ${body}`);
+        console.log(`Proxying request to tcp server ${hostAddress}:${port} ${body}`);
         client.write(body);
     });
 
