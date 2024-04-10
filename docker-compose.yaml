@@ -10,10 +10,13 @@ services:
       -rpcbind=0.0.0.0
       -rpcuser=user
       -rpcpassword=pass
+      -server=1
     ports:
       - "18443:18443"
+      - "18444:18444"
     expose:
       - "18443"
+      - "18444"
     volumes:
       - bitcoind-data:/data
     networks:
@@ -27,6 +30,7 @@ services:
       - --db-dir=/data
       - --electrum-rpc-addr=0.0.0.0:50001
       - --daemon-rpc-addr=bitcoind:18443
+      - --daemon-p2p-addr=bitcoind:18444
       - --cookie-file
       - /bitcoind/.cookie
     ports:

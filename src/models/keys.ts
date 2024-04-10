@@ -39,6 +39,6 @@ export class Keys {
     }
 
     private static importFromSeed(seed:Buffer,network:bitcoin.Network):Keys {
-        return new Keys(bip32.fromSeed(seed),network);
+        return new Keys(bip32.fromSeed(seed,network),network);
     }
 }
