@@ -10,7 +10,13 @@ interface TableRow extends Address {
     utxoInt: electrumClient.ListUnspentResponseElement[] | undefined,
     amountExt: number | undefined,
     utxoExt: electrumClient.ListUnspentResponseElement[] | undefined,
+    isExpanded: boolean,
+    selectedUtxos?: Set<number>
 }
+
+type SelectedUtxoMap = {
+    [key:string]:electrumClient.ListUnspentResponseElement;
+};
 
 
 export const Wallet = () => {
@@ -19,9 +25,23 @@ export const Wallet = () => {
     const [ derivePath, setDerivePath ] = useState("m/0'/0/0");
     const [ account, setAccount ] = useState(0);
     const [ addresses, setAddresses ] = useState<Address[]>([]);
-    const [ firstAddress, setFirstAddress ] = useState('');
     const [ highlighted, setHighlighted ] = useState({rowIndex: 0, colType: ''});
     const [ tableData, setTableData ] = useState<TableRow[]>([]);
+    const [ expandedRows, setExpandedRows ] = useState(new Set());
+    const [ selectedUtxos, setSelectedUtxos ] = useState<SelectedUtxoMap>({});
+
+
+    const handleUtxoSelect = (
+        utxo: electrumClient.ListUnspentResponseElement, 
+        checked: boolean) => {
+        if(checked){
+            const newState = {...selectedUtxos, [utxo.tx_hash]: utxo }
+            setSelectedUtxos(newState)
+        } else {
+            const {[utxo.tx_hash]:_, ...newState } = selectedUtxos;
+            setSelectedUtxos(newState);
+        }
+    }
 
 
     useEffect(() => {
@@ -32,16 +52,19 @@ export const Wallet = () => {
                 setAccount(parseInt(account[1]));
                 let addresses = getAddressesForAccount(parseInt(account[1]),state.settings.addressType,state.keys!);
                 setAddresses(addresses)
-                let tableData: TableRow[] = addresses.map( it => ({externalPubAddress: it.externalPubAddress, 
-                    internalPubAddress: it.internalPubAddress,
-                    amountExt: undefined,
-                    utxoExt: undefined,
-                    amountInt: undefined,
-                    utxoInt: undefined}));
+                let tableData: TableRow[] = addresses.map( it => (
+                    {
+                        externalPubAddress: it.externalPubAddress, 
+                        internalPubAddress: it.internalPubAddress,
+                        amountExt: undefined,
+                        utxoExt: undefined,
+                        amountInt: undefined,
+                        utxoInt: undefined,
+                        isExpanded: false
+                    }
+                ));
                 setTableData(tableData)
             }
-            let address = getAddressP2WPKH(state.keys?.hdRoot.derivePath(derivePath).neutered(),state.keys?.network)
-            setFirstAddress(address);
         } 
     },[derivePath,state.keys]);
 
@@ -50,29 +73,29 @@ export const Wallet = () => {
     useEffect(() => {
         const fetchData = async (address: string) : Promise<electrumClient.ListUnspentResponseElement[]> => {
             let utxos = await electrumClient.getUtxos(address,state.keys?.network!,state.settings.electrsProxyHost);
-            return utxos; // Or whatever data you're fetching
+            return utxos;
         };
     
         const accumulateData = async () => {
             let tableDataPromises = addresses.map(async (address) => {
                 try {
                     // Wait for both promises to resolve before proceeding
-                    const [externalAddrAmount, internalAddrAmount] = await Promise.all([
+                    const [externalAddrUtxos, internalAddrUtxos] = await Promise.all([
                         fetchData(address.externalPubAddress),
                         fetchData(address.internalPubAddress),
                     ]);
-                    const sumInternal = internalAddrAmount.reduce((accumulator, currentItem) => {
+                    const sumInternal = internalAddrUtxos.reduce((accumulator, currentItem) => {
                         return accumulator + currentItem.value;
                       }, 0);
-                    const sumExternal = externalAddrAmount.reduce((accumulator, currentItem) => {
+                    const sumExternal = externalAddrUtxos.reduce((accumulator, currentItem) => {
                         return accumulator + currentItem.value;
                       }, 0);
                     
                     // Return the new object to include in tableData
-                    return {...address, amountExt: sumExternal, amountInt: sumInternal, utxoInt: internalAddrAmount, utxoExt: externalAddrAmount};
+                    return {...address, amountExt: sumExternal, amountInt: sumInternal, utxoInt: internalAddrUtxos, utxoExt: externalAddrUtxos,isExpanded: false};
                 } catch (error) {
                     console.error(error);
-                    return { ...address, amountExt: 0, amountInt: 0, utxoExt: [], utxoInt: [] }; // Or however you wish to handle errors
+                    return { ...address, amountExt: 0, amountInt: 0, utxoExt: [], utxoInt: [], isExpanded: false }; // Or however you wish to handle errors
                 }
             });
     
@@ -80,12 +103,22 @@ export const Wallet = () => {
             const tableData = await Promise.all(tableDataPromises);
     
             // Update state with the accumulated data
+            console.log(tableData)
             setTableData(tableData);
         };
     
         accumulateData();
     }, [addresses,state.keys]); // Dependency array - re-run the effect if something changes, if needed
 
+    const toggleRowExpansion = (rowIndex:number) => {
+        const newExpandedRows = new Set(expandedRows);
+        if (newExpandedRows.has(rowIndex)) {
+            newExpandedRows.delete(rowIndex);
+        } else {
+            newExpandedRows.add(rowIndex);
+        }
+        setExpandedRows(newExpandedRows);
+    };
 
     return (
         <div>
@@ -93,12 +126,10 @@ export const Wallet = () => {
             <input type="text"
             value={derivePath}
             onChange={(e) => setDerivePath(e.target.value)}/>
-            <div>
-                first address: {firstAddress}
-            </div>
             <table>
                 <thead>
                     <tr>
+                    <th>Toggle</th>
                     <th>Public Address</th>
                     <th>Amount</th>
                     <th>Change Address</th>
@@ -107,28 +138,62 @@ export const Wallet = () => {
                 </thead>
                 <tbody>
                     {tableData.map((row, rowIndex) => (
-                    <tr key={rowIndex}>
-                        <td onClick={() => setHighlighted({ rowIndex, colType: 'first-second' })}
-                            style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType ==='first-second' ? 'yellow' : 'transparent' }}
-                        >
-                            {row.externalPubAddress}
-                        </td>
-                        <td onClick={() => setHighlighted({ rowIndex, colType: 'first-second' })}
-                            style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType === 'first-second' ? 'yellow' : 'transparent' }}
-                        >
-                            {row.amountExt}
-                        </td>
-                        <td onClick={() => setHighlighted({ rowIndex, colType: 'third-fourth' })}
-                            style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType === 'third-fourth' ? 'yellow' : 'transparent' }}
-                        >
-                            {row.internalPubAddress}
-                        </td>
-                        <td onClick={() => setHighlighted({ rowIndex, colType: 'third-fourth' })}
-                            style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType === 'third-fourth' ? 'yellow' : 'transparent' }}
-                        >
-                            {row.amountInt}
-                        </td>
-                    </tr>
+                        <>
+                            <tr key={rowIndex}>
+                                <td>
+                                    <button onClick={() => toggleRowExpansion(rowIndex)}>
+                                        {expandedRows.has(rowIndex) ? '-' : '+'}
+                                    </button>
+                                </td>
+                                <td onClick={() => setHighlighted({ rowIndex, colType: 'first-second' })}
+                                    style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType ==='first-second' ? 'yellow' : 'transparent' }}
+                                >
+                                    {row.externalPubAddress}
+                                </td>
+                                <td onClick={() => setHighlighted({ rowIndex, colType: 'first-second' })}
+                                    style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType === 'first-second' ? 'yellow' : 'transparent' }}
+                                >
+                                    {row.amountExt}
+                                </td>
+                                <td onClick={() => setHighlighted({ rowIndex, colType: 'third-fourth' })}
+                                    style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType === 'third-fourth' ? 'yellow' : 'transparent' }}
+                                >
+                                    {row.internalPubAddress}
+                                </td>
+                                <td onClick={() => setHighlighted({ rowIndex, colType: 'third-fourth' })}
+                                    style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType === 'third-fourth' ? 'yellow' : 'transparent' }}
+                                >
+                                    {row.amountInt}
+                                </td>
+                                
+                            </tr>
+                            {expandedRows.has(rowIndex) && (
+                            <>
+                                {row.utxoExt?.map((utxo, utxoIndex) => (
+                                    <tr key={`ext-${utxoIndex}`}>
+                                        <td colSpan={5}>
+                                            <input type="checkbox"
+                                                checked={utxo.tx_hash in selectedUtxos}
+                                                onChange={(e) => handleUtxoSelect(utxo, e.target.checked)}
+                                            />
+                                            {utxo.value}
+                                        </td>
+                                    </tr>
+                                ))}
+                                {row.utxoInt?.map((utxo, utxoIndex) => (
+                                    <tr key={`int-${utxoIndex}`}>
+                                        <td colSpan={5}>
+                                            <input type="checkbox"
+                                                checked={utxo.tx_hash in selectedUtxos}
+                                                onChange={(e) => handleUtxoSelect(utxo, e.target.checked)}
+                                            />
+                                            {utxo.value}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </>
+                            )}
+                        </>
                     ))}
                 </tbody>
             </table>
