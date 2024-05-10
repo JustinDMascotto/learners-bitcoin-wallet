@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react"
 import { Address, getAddressesForAccount, getAddressP2WPKH } from '../../utils/addressUtils'
 import * as electrumClient from '../../services/electrumClient'
 import * as wallet from './Wallet'
-import { WalletAddressType } from "../../models/settings";
+import { AmmountDenomination, WalletAddressType } from "../../models/settings";
 import { Keys } from "../../models/keys";
+import { viewInDenomination } from "../../utils/denominationUtils";
 
 interface TableRow extends Address {
     amountInt: number | undefined,
@@ -19,10 +20,11 @@ interface UtxoViewerProps {
     setSelectedUtxos: (utxos:wallet.SelectedUtxoMap) => void;
     addressType: WalletAddressType,
     keys: Keys,
-    electrsProxyHost: string
+    electrsProxyHost: string,
+    denomination:AmmountDenomination
 }
 
-export const UtxoViewer: React.FC<UtxoViewerProps> = ({selectedUtxos, setSelectedUtxos,addressType,keys,electrsProxyHost}) => {
+export const UtxoViewer: React.FC<UtxoViewerProps> = ({selectedUtxos, setSelectedUtxos,addressType,keys,electrsProxyHost,denomination}) => {
     const [ derivePath, setDerivePath ] = useState("m/0'/0/0");
     const [ account, setAccount ] = useState(0);
     const [ highlighted, setHighlighted ] = useState({rowIndex: 0, colType: ''});
@@ -151,7 +153,7 @@ export const UtxoViewer: React.FC<UtxoViewerProps> = ({selectedUtxos, setSelecte
                                 <td onClick={() => setHighlighted({ rowIndex, colType: 'first-second' })}
                                     style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType === 'first-second' ? 'yellow' : 'transparent' }}
                                 >
-                                    {row.amountExt}
+                                    {viewInDenomination(row.amountExt,denomination)}
                                 </td>
                                 <td onClick={() => setHighlighted({ rowIndex, colType: 'third-fourth' })}
                                     style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType === 'third-fourth' ? 'yellow' : 'transparent' }}
@@ -161,7 +163,7 @@ export const UtxoViewer: React.FC<UtxoViewerProps> = ({selectedUtxos, setSelecte
                                 <td onClick={() => setHighlighted({ rowIndex, colType: 'third-fourth' })}
                                     style={{ backgroundColor: highlighted.rowIndex === rowIndex && highlighted.colType === 'third-fourth' ? 'yellow' : 'transparent' }}
                                 >
-                                    {row.amountInt}
+                                    {viewInDenomination(row.amountInt,denomination)}
                                 </td>
                                 
                             </tr>
@@ -174,7 +176,7 @@ export const UtxoViewer: React.FC<UtxoViewerProps> = ({selectedUtxos, setSelecte
                                                 checked={utxo.tx_hash in selectedUtxos}
                                                 onChange={(e) => handleUtxoSelect(utxo, e.target.checked)}
                                             />
-                                            {utxo.value}
+                                            {viewInDenomination(utxo.value,denomination)}
                                         </td>
                                     </tr>
                                 ))}
@@ -185,7 +187,7 @@ export const UtxoViewer: React.FC<UtxoViewerProps> = ({selectedUtxos, setSelecte
                                                 checked={utxo.tx_hash in selectedUtxos}
                                                 onChange={(e) => handleUtxoSelect(utxo, e.target.checked)}
                                             />
-                                            {utxo.value}
+                                            {viewInDenomination(utxo.value,denomination)}
                                         </td>
                                     </tr>
                                 ))}
