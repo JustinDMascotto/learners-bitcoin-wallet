@@ -2,7 +2,7 @@ import * as bitcoin from 'bitcoinjs-lib'
 import { AppStateProvider, useAppState } from '../../components/AppState'
 import {useEffect,useState} from 'react'
 import SidePanel from '../../components/SidePanel'
-import { WalletAddressType, NetworkKey } from '../../models/settings'
+import { WalletAddressType, NetworkKey, AmmountDenomination } from '../../models/settings'
 import { getSettings } from './settingsUtil'
 
 export const SettingsUi = () => {
@@ -36,6 +36,15 @@ export const SettingsUi = () => {
             setSettings({...getSettings(),electrsProxyHost:event.target.value})
         } else {
             setSettings({...settings,electrsProxyHost:event.target.value});
+        }
+    }
+
+    const changeDenomination = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const denomination = AmmountDenomination[event.target.value as keyof typeof AmmountDenomination];
+        if(settings == undefined){
+            setSettings({...getSettings(),ammountDenomination:denomination})
+        } else {
+            setSettings({...settings,ammountDenomination:denomination})
         }
     }
 
@@ -77,6 +86,23 @@ export const SettingsUi = () => {
                 value={settings?.electrsProxyHost}
                 onChange={changeElectrsHost}
                 ></input>
+            </div>
+            <div>
+                <label>Denomination:</label>
+                <div>
+                    <input
+                        type="radio"
+                        value="BTC"
+                        checked={settings?.ammountDenomination === AmmountDenomination.BTC}
+                        onChange={changeDenomination}
+                    /> BTC
+                    <input
+                        type="radio"
+                        value="SAT"
+                        checked={settings?.ammountDenomination === AmmountDenomination.SAT}
+                        onChange={changeDenomination}
+                    /> SAT
+                </div>
             </div>
             <button onClick={saveSettings}>Save Settings</button>
         </div>

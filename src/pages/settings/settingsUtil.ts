@@ -1,4 +1,4 @@
-import { Settings, WalletAddressType } from "../../models/settings";
+import { Settings, WalletAddressType, AmmountDenomination } from "../../models/settings";
 
 export const getSettings = ():Settings => {
     const settings = localStorage.getItem('settings');
@@ -6,6 +6,6 @@ export const getSettings = ():Settings => {
     if(settings !== null && settings !== undefined && settings !== 'undefined'){
         return JSON.parse(settings)
     } else {
-        return new Settings('MAINNET',WalletAddressType.P2PKH,'');
+        return new Settings('MAINNET',WalletAddressType.P2PKH,'',AmmountDenomination.SAT);
     }
 }

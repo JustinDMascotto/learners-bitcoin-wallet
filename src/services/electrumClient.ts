@@ -72,6 +72,7 @@ export async function sendRequestAxios(electrsProxyHost:string,method:string,par
       console.log(JSON.stringify(data));
       
       const response = await axios.post(`${electrsProxyHost}/send-request`, data);
+      console.log(response.data)
       return response; // The caller will need to use response.data to access the returned data
     } catch (error) {
       console.error('Request failed:', error);

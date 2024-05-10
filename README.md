@@ -44,3 +44,27 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+
+
+Setting up Regtest docker environment
+1. docker compose up the contaienrs
+1. create a wallet ```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass createwallet "mywallet"```
+    load wallet ```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass loadwallet "mywallet"```
+1. generate some blocks ```docker exec -it f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass -generate 101```
+
+
+# Other helpful commands
+1. list wallets
+```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass listwallets```
+1. Import private keys (false tells it not to scan the blockchain for utxos) into the wallet specified
+```docker exec -it f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass importprivkey "cNGWP57ZDWFDfFdthpBAf5dsm927tqdZ89dePh6Mgzn6Di1vj2Gu" "mywallet" false```
+1. dump private key of address
+```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass dumpprivkey "bcrt1qlu23tu7rpy7qxg8r4c97cp0v58qkxx6zgyhdw6"```
+1. get network info
+```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass getnetworkinfo```
+```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass getblockchaininfo```
+1. list received addresses
+```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass listreceivedbyaddress 0 true```
+1. get balance
+```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass getbalance```

@@ -1,0 +1,65 @@
+version: '3'
+
+services:
+  bitcoind:
+    image: ruimarinho/bitcoin-core:22.0
+    command:
+      -printtoconsole
+      -regtest=1
+      -rpcallowip=0.0.0.0/0
+      -rpcbind=0.0.0.0
+      -rpcuser=user
+      -rpcpassword=pass
+      -server=1
+      -fallbackfee=0.0002
+    ports:
+      - "18443:18443"
+      - "18444:18444"
+    expose:
+      - "18443"
+      - "18444"
+    volumes:
+      - bitcoind-data:/data
+    networks:
+      - localnet
+
+  electrs:
+    image: getumbrel/electrs:v0.10.2
+    command:
+      - --network
+      - regtest
+      - --db-dir=/data
+      - --electrum-rpc-addr=0.0.0.0:50001
+      - --daemon-rpc-addr=bitcoind:18443
+      - --daemon-p2p-addr=bitcoind:18444
+      - --cookie-file
+      - /bitcoind/.cookie
+    ports:
+      - "50001:50001"
+    expose:
+      - "50001"
+    depends_on:
+      - bitcoind
+    volumes:
+      - electrs-data:/data
+      - ./.cookie:/bitcoind/.cookie
+    networks:
+      - localnet
+  
+  electrs-proxy:
+    image: electrs-proxy
+    ports: 
+      - 3001:3001
+    depends_on:
+      - electrs
+    networks:
+      - localnet
+    environment:
+      - ELECTRS_HOST=electrs:50001
+
+volumes:
+  bitcoind-data:
+  electrs-data:
+
+networks:
+  localnet:

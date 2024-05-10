@@ -4,13 +4,16 @@ export class Settings {
     network: NetworkKey
     addressType: WalletAddressType
     electrsProxyHost: string
+    ammountDenomination: AmmountDenomination
 
     constructor(network:NetworkKey,
                 addressType:WalletAddressType,
-                electrsProxyHost:string){
+                electrsProxyHost:string,
+                ammountDenomination:AmmountDenomination){
         this.network = network
         this.addressType = addressType
         this.electrsProxyHost = electrsProxyHost
+        this.ammountDenomination = ammountDenomination
     }
 }
 
@@ -22,4 +25,9 @@ export enum WalletAddressType{
     P2WPKH = 'P2WPKH',
     P2WSH = 'P2WSH',
     P2TR = 'P2TR'
+}
+
+export enum AmmountDenomination{
+    BTC,
+    SAT
 }
