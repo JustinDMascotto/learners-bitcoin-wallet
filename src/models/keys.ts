@@ -3,7 +3,7 @@ import * as bitcoin from 'bitcoinjs-lib'
 import * as bip39 from 'bip39';
 import { BIP32Factory } from 'bip32';
 
-const ecc: bip32Int.TinySecp256k1Interface = require('@bitcoinerlab/secp256k1')
+const ecc: bip32Int.TinySecp256k1Interface = require('@bitcoinerlab/secp256k1');
 const bip32 = BIP32Factory(ecc);
 
 export class Keys {
@@ -29,11 +29,11 @@ export class Keys {
         return this.importFromSeed(seed,network);
     }
 
-    static importFromHex(hex:string,network:bitcoin.Network):Keys {
+    static importFromHex(hex:string,network:bitcoin.Network) : Keys {
         return this.importFromSeed(Buffer.from(hex,'hex'),network);
     }
 
-    static importBrainWallet(secret:string,network:bitcoin.Network):Keys {
+    static importBrainWallet(secret:string,network:bitcoin.Network) : Keys {
         let buffer = Buffer.from(secret,'utf8');
         return this.importFromSeed(buffer,network);
     }

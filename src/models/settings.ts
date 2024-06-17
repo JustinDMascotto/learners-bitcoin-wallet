@@ -28,6 +28,6 @@ export enum WalletAddressType{
 }
 
 export enum AmmountDenomination{
-    BTC,
-    SAT
+    BTC = "BTC",
+    SAT = "SAT"
 }
