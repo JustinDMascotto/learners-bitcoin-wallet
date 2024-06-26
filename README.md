@@ -72,6 +72,8 @@ Setting up Regtest docker environment
 ```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass generatetoaddress 10 2N7bYH986fxWUB4LovPWsMHnXAkh5vgGuB6```
 1. send to address 
 ```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass sendtoaddress mvHrxjbGSjmM4gan8sGfsnqxFQXSBWk8p6 0.234```
+1. get transaction by id
+```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass getrawtransaction 52cb5820911ff16d8eb51a5ab3f7476d8716f9afd8293c02cbb17f0e1a654bd5 true```
 
 # Self notes
 To pick up 
