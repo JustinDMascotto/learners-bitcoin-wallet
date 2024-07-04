@@ -1,6 +1,8 @@
 import { intToLittleEndian, littleEndianToBigEndian, uint8ArrayToHexString, hash256 } from "../../utils/byteUtils"
 import { HexStreamReader, concatUint8Arrays, hexStringToUint8Array, reverseUint8Array, parseVarInt, encodeVarint } from "../../utils/parseUtils"
+import { getRawTransaction } from "../electrumClient"
 import { Script } from "./script"
+import * as bitcoin from 'bitcoinjs-lib'
 
 export interface RawTransactionResult {
     result: RawTransaction
@@ -55,12 +57,18 @@ export class Tx implements Transaction {
     locktime: number
     segwitMarkerAndFlag: string | undefined
 
-    constructor(version:number,vin:IInput[],vout:IOutput[],locktime:number,segwitMarkerAndFlag:string|undefined=undefined){
+    constructor(
+        version:number,
+        vin:IInput[],
+        vout:IOutput[],
+        locktime:number,
+        segwitMarkerAndFlag:string|undefined=undefined
+    ){
         this.version = version;
         this.vin = vin;
         this.vout = vout;
         this.locktime = locktime;
-        this.segwitMarkerAndFlag = segwitMarkerAndFlag
+        this.segwitMarkerAndFlag = segwitMarkerAndFlag;
     }
 
     /**
@@ -78,6 +86,26 @@ export class Tx implements Transaction {
     hash(): Uint8Array {
         return hash256(this.serializeLegacy()).reverse();
     }
+
+    async fee(electrsProxyHost:string): Promise<number> {
+        // Initialize input sum and output sum
+        let inputSum = 0;
+        let outputSum = 0;
+    
+        // Use TxIn.value() to sum up the input amounts
+        for (const tx_in of this.vin) {
+          inputSum += await TxIn.value(tx_in.txid,tx_in.vout,electrsProxyHost);
+        }
+    
+        // Use TxOut.amount to sum up the output amounts
+        for (const tx_out of this.vout) {
+          outputSum += tx_out.value;
+        }
+    
+        // Fee is input sum - output sum
+        return inputSum - outputSum;
+    }
+
 
     serialize(): Uint8Array {
         return this.segwitMarkerAndFlag == '0001' ? this.serializeSegwit() : this.serializeLegacy();
@@ -188,7 +216,7 @@ export interface IInput {
     // An array of hex-encoded witness data (if any).
     txinwitness: any[] | undefined
     // The output number from the previous transaction
-    vout: number | undefined
+    vout: number
 
     serialize():Uint8Array
 }
@@ -204,12 +232,30 @@ export class TxIn implements IInput {
     // The output number from the previous transaction
     vout: number
 
-    constructor(scriptSig:IScriptSig,sequence:number,txid:string,txiwitness:any[]|undefined,vout:number){
+    constructor(
+        scriptSig:IScriptSig,
+        sequence:number,
+        txid:string,
+        vout:number,
+        txiwitness:any[]|undefined=undefined
+    ){
         this.scriptSig = scriptSig;
         this.sequence = sequence;
         this.txid = txid;
         this.txinwitness = txiwitness;
         this.vout = vout
+    }
+
+    // used to get the value of the input, value is denominated in btc not satoshi
+    static async value(transactionId:string,index:number,electrsProxyHost:string):Promise<number> {
+        const tx = await getRawTransaction(transactionId,electrsProxyHost);
+        return tx['vout'][index].value * 100_000_000;
+    }
+
+    // Get the ScriptPubKey by looking up the tx hash Returns a Script object
+    static async scriptPubKey(transactionId:string,index:number,electrsProxyHost:string):Promise<IScriptPubKey> {
+        const tx = await getRawTransaction(transactionId,electrsProxyHost);
+        return tx['vout'][index].scriptPubKey
     }
 
     serialize():Uint8Array {
@@ -232,7 +278,7 @@ export class TxIn implements IInput {
         const vout = hex.readLE2D(4);
         const segwitScriptSig = ScriptSig.parse(hex);
         const sequence = hex.readLE2D(4);
-        return new TxIn(segwitScriptSig,sequence,txid,[],vout);
+        return new TxIn(segwitScriptSig,sequence,txid,vout);
     }
 }
 
