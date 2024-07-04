@@ -1,7 +1,6 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import axios from 'axios'
-import { getSettings } from '../pages/settings/settingsUtil';
-
+import { Tx } from './model/raw-transaction';
 
 // supports both bech32 and base58 address formats
 export async function getUtxos(address:string,network:bitcoin.networks.Network,electrsProxyHost:string):Promise<ListUnspentResponseElement[]> {
@@ -18,9 +17,9 @@ export interface ListUnspentResponseElement {
     value: number
 }
 
-export async function getRawTransaction(transactionId:string,electrsProxyHost:string) {
+export async function getRawTransaction(transactionId:string,electrsProxyHost:string):Promise<Tx> {
   const response = await sendRequestAxios(electrsProxyHost,"blockchain.transaction.get",[transactionId,true]);
-  return response.data.result;
+  return response.data.result as Tx;
 }
 
 

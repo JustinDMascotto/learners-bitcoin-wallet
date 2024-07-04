@@ -36,6 +36,15 @@ describe("test electrum connection and api", () => {
         expect(response.data.result).toHaveLength(0);
     });
 
+    test("getRawTransaction", async () => {
+        const txId = "52cb5820911ff16d8eb51a5ab3f7476d8716f9afd8293c02cbb17f0e1a654bd5";
+        const tx = await electurmClient.getRawTransaction(txId,electrsProxyHost);
+        expect(tx).toBeDefined();
+        expect(tx).toHaveProperty('txid', txId);
+        expect(tx).toHaveProperty('vout');
+        expect(tx).toHaveProperty('vin');
+    });
+
     // takes to long to run
     // test("get utxo for genesis block address", async () => {
     //     const address  = '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'
