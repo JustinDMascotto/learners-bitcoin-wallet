@@ -49,22 +49,34 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 Setting up Regtest docker environment
 1. docker compose up the contaienrs
-1. create a wallet ```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass createwallet "mywallet"```
-    load wallet ```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass loadwallet "mywallet"```
-1. generate some blocks ```docker exec -it f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass -generate 101```
+1. create a wallet ```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass createwallet "mywallet"```
+    load wallet ```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass loadwallet "mywallet"```
+1. generate some blocks ```docker exec -it learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass -generate 101```
 
 
 # Other helpful commands
 1. list wallets
-```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass listwallets```
+```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass listwallets```
 1. Import private keys (false tells it not to scan the blockchain for utxos) into the wallet specified
-```docker exec -it f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass importprivkey "cNGWP57ZDWFDfFdthpBAf5dsm927tqdZ89dePh6Mgzn6Di1vj2Gu" "mywallet" false```
+```docker exec -it learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass importprivkey "cNGWP57ZDWFDfFdthpBAf5dsm927tqdZ89dePh6Mgzn6Di1vj2Gu" "mywallet" false```
 1. dump private key of address
-```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass dumpprivkey "bcrt1qlu23tu7rpy7qxg8r4c97cp0v58qkxx6zgyhdw6"```
+```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass dumpprivkey "bcrt1qlu23tu7rpy7qxg8r4c97cp0v58qkxx6zgyhdw6"```
 1. get network info
-```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass getnetworkinfo```
-```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass getblockchaininfo```
-1. list received addresses
-```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass listreceivedbyaddress 0 true```
+```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass getnetworkinfo```
+```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass getblockchaininfo```
+1. list received addresses (minimum number of confirmations, include addresses that havent received funds)
+```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass listreceivedbyaddress 0 true```
 1. get balance
-```docker exec f3c941d354f1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass getbalance```
+```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass getbalance```
+1. generate to address
+```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass generatetoaddress 10 2N7bYH986fxWUB4LovPWsMHnXAkh5vgGuB6```
+1. send to address 
+```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass sendtoaddress mvHrxjbGSjmM4gan8sGfsnqxFQXSBWk8p6 0.234```
+1. get transaction by id
+```docker exec learners-bitcoin-wallet-bitcoind-1 bitcoin-cli -regtest -rpcuser=user -rpcpassword=pass getrawtransaction 52cb5820911ff16d8eb51a5ab3f7476d8716f9afd8293c02cbb17f0e1a654bd5 true```
+
+# Self notes
+To pick up 
+1. load wallet with load wallet command above
+1. your funds are at path m/0'/0/0
+1. possibly need to generate some blocks for elects to "wake up"

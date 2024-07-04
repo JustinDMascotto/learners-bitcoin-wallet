@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useAppState } from "../../components/AppState"
 import SidePanel from "../../components/SidePanel";
 import * as electrumClient from '../../services/electrumClient'
 import { UtxoViewer } from "./UtxoViewer";
+import { TransactionViewer } from "./TransactionViewer";
 
 
 export type SelectedUtxoMap = {
@@ -26,6 +27,11 @@ export const Wallet = () => {
                 electrsProxyHost={state.settings.electrsProxyHost}
                 denomination={state.settings.ammountDenomination}
             />
+            <TransactionViewer 
+                selectedUtxos={selectedUtxos}
+                electrsProxyHost={state.settings.electrsProxyHost}
+                denomination={state.settings.ammountDenomination}>
+            </TransactionViewer>
         </div>
     );
 }
